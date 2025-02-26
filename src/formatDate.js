@@ -9,41 +9,48 @@
  */
 function formatDate(date, fromFormat, toFormat) {
   // write code here
-  const data = {};
-  let newDataStr = '';
-  let separator = fromFormat[3];
-  const dateArr = date.split(separator);
+  let newFormatedDate = '';
+  const oldSeparator = fromFormat[3];
+  const splitedOldDate = date.split(oldSeparator);
+  const dateMap = getDate(fromFormat, splitedOldDate);
+  const newSeparator = toFormat[3];
 
   for (let i = 0; i < 3; i++) {
-    data[fromFormat[i]] = dateArr[i];
+    if (newFormatedDate.length) {
+      newFormatedDate += newSeparator;
+    }
 
-    if (fromFormat[i] === 'YYYY') {
-      data.YY = dateArr[i] % 100;
+    newFormatedDate += dateMap[toFormat[i]];
+  }
+
+  return newFormatedDate;
+}
+
+function getDate(format, dateArr) {
+  const dateMap = {};
+  const longYear = 'YYYY';
+  const shortYear = 'YY';
+
+  for (let i = 0; i < 3; i++) {
+    dateMap[format[i]] = dateArr[i];
+
+    if (format[i] === longYear) {
+      dateMap[shortYear] = dateArr[i] % 100;
       continue;
     }
 
-    if (fromFormat[i] === 'YY') {
+    if (format[i] === shortYear) {
       if (dateArr[i] < 30) {
-        data.YYYY = 2000 + +dateArr[i];
+        dateMap[longYear] = 2000 + +dateArr[i];
         continue;
       }
 
-      data.YYYY = 1900 + +dateArr[i];
+      dateMap[longYear] = 1900 + Number(dateArr[i]);
       continue;
     }
   }
 
-  separator = toFormat[3];
-
-  for (let i = 0; i < 3; i++) {
-    if (newDataStr.length) {
-      newDataStr += separator;
-    }
-
-    newDataStr += data[toFormat[i]];
-  }
-
-  return newDataStr;
+  return dateMap;
 }
 
 module.exports = formatDate;
